@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:matchapp/ChatlistScreen.dart' as chat;
 import 'package:matchapp/LoginScreen.dart';
 import 'package:matchapp/MusicScreen.dart';
 import 'package:matchapp/Profile.dart';
@@ -24,10 +23,12 @@ class MyApp extends StatelessWidget {
   final String? username;
   final String? email;
 
-  MyApp(
-      {required this.token,
+  const MyApp(
+      {Key? key,
+      required this.token,
       required this.username,
-      required this.email}); // token, username ve email parametreleri
+      required this.email})
+      : super(key: key); // token, username ve email parametreleri
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +52,9 @@ class HomeScreen extends StatefulWidget {
   final String username;
   final String email;
 
-  HomeScreen(
-      {required this.id,
-      required this.username,
-      required this.email}); // ID, username ve email'i alacak şekilde düzenlendi
+  const HomeScreen(
+      {Key? key, required this.id, required this.username, required this.email})
+      : super(key: key); // ID, username ve email'i alacak şekilde düzenlendi
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _screens = [
       MusicScreen(id: widget.id), // ID'yi MusicScreen'e geç
-      ChatListScreen(userId: widget.id),
+      Chatlistscreen(),
       ProfileScreen(
           onLogout: _logout,
           username: widget.username,

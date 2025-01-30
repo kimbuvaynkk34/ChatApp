@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:matchapp/ChatlistScreen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final VoidCallback onLogout;
   final String username;
   final String email;
 
-  ProfileScreen(
-      {required this.onLogout, required this.username, required this.email});
+  const ProfileScreen(
+      {Key? key,
+      required this.onLogout,
+      required this.username,
+      required this.email})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +98,6 @@ class ProfileScreen extends StatelessWidget {
                 onPressed: () {
                   // Ek bir işlem yap
                 },
-                child: Text('Custom Action'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF1DB954),
                   padding:
@@ -104,6 +106,7 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                 ),
+                child: Text('Custom Action'),
               ),
             ],
           ),

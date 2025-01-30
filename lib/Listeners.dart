@@ -6,7 +6,8 @@ class ListenersScreen extends StatefulWidget {
   final String track;
   final String artist;
 
-  ListenersScreen({required this.track, required this.artist});
+  const ListenersScreen({Key? key, required this.track, required this.artist})
+      : super(key: key);
 
   @override
   _ListenersScreenState createState() => _ListenersScreenState();

@@ -7,7 +7,7 @@ import 'package:matchapp/PlaylistDetails.dart';
 class MusicScreen extends StatefulWidget {
   final String? id;
 
-  MusicScreen({required this.id});
+  const MusicScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   _MusicScreenState createState() => _MusicScreenState();
@@ -34,6 +34,7 @@ class _MusicScreenState extends State<MusicScreen> {
       final musicResponse = await Dio().get(
           'http://31.57.156.116:44430/api/GetCurrentlyPlayRealtime/${widget.id}');
       final music = musicResponse.data;
+      print(music);
 
       setState(() {
         musicData = [
@@ -92,7 +93,7 @@ class _MusicScreenState extends State<MusicScreen> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white)),
               SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 200,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -140,7 +141,7 @@ class _MusicScreenState extends State<MusicScreen> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white)),
               SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 200,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -165,7 +166,7 @@ class _MusicScreenState extends State<MusicScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
+                            SizedBox(
                               height: 145,
                               child: Image.network(
                                 playlist['image'],

@@ -1,8 +1,6 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'ChatScreen.dart';
 
 class PlaylistDetails extends StatefulWidget {
   final String playlistId;

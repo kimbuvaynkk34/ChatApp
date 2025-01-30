@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
 class Chatscreen extends StatefulWidget {
+  const Chatscreen({Key? key}) : super(key: key);
+
   @override
   _ChatPageState createState() => _ChatPageState();
 }
@@ -24,7 +26,7 @@ class _ChatPageState extends State<Chatscreen> {
   // SignalR bağlantısını başlatma
   void _initializeSignalR() {
     _connection = HubConnectionBuilder()
-        .withUrl("http://localhost:5051/chatHub") // SignalR Hub URL
+        .withUrl("http://31.57.156.116:44430/chatHub") // SignalR Hub URL
         .build();
 
     // Mesaj alma
@@ -49,7 +51,7 @@ class _ChatPageState extends State<Chatscreen> {
   // Odaya katılma
   void _joinRoom() {
     roomName = _roomController.text;
-    if (roomName != null && roomName!.isNotEmpty) {
+    if (roomName.isNotEmpty) {
       _connection.invoke("JoinRoom", args: [roomName]).catchError((err) {
         print("Error joining room: $err");
       });
@@ -63,7 +65,7 @@ class _ChatPageState extends State<Chatscreen> {
 
   // Oda mesajlarını almak
   void _getRoomMessages() {
-    if (roomName != null && roomName!.isNotEmpty) {
+    if (roomName.isNotEmpty) {
       _connection.invoke("GetRoomMessages", args: [roomName]).catchError((err) {
         print("Error getting room messages: $err");
       });
@@ -73,9 +75,9 @@ class _ChatPageState extends State<Chatscreen> {
   // Mesaj gönderme
   void _sendMessage() {
     final message = _messageController.text;
-    if (message.isNotEmpty && roomName != null && roomName!.isNotEmpty) {
+    if (message.isNotEmpty && roomName.isNotEmpty) {
       _connection.invoke("SendMessage",
-          args: [roomName, message, 1]).catchError((err) {
+          args: [roomName, message, 2]).catchError((err) {
         print("Error sending message: $err");
       });
       _messageController.clear();

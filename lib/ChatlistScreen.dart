@@ -1,140 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
-ValueNotifier<List<dynamic>> messageList = ValueNotifier<List<dynamic>>([]);
-
-class ChatListScreen extends StatefulWidget {
-  final String userId;
-
-  const ChatListScreen({Key? key, required this.userId}) : super(key: key);
-
+class Chatlistscreen extends StatefulWidget {
   @override
-  _ChatListScreenState createState() => _ChatListScreenState();
+  _ChatAppState createState() => _ChatAppState();
 }
 
-class _ChatListScreenState extends State<ChatListScreen> {
-  final String _hubUrl = "http://localhost:5051";
-  final String _hubName = "chatHub";
+class _ChatAppState extends State<Chatlistscreen> {
   late HubConnection _hubConnection;
+  List<Map<String, String>> messages = [];
+  int userId = 1; // Kullanıcı ID
 
   @override
   void initState() {
     super.initState();
-    signalRConnection();
+    _connectSignalR();
   }
 
-  Future<void> signalRConnection() async {
+  Future<void> _connectSignalR() async {
     _hubConnection = HubConnectionBuilder()
-        .withUrl("$_hubUrl/$_hubName")
-        .withAutomaticReconnect(retryDelays: [0, 1000, 5000, 10000]).build();
+        .withUrl("http://localhost:5051/chatHub") // API URL'ni buraya yaz
+        .build();
 
-    _hubConnection.on("ReceiveUserLastMessages", (message) {
-      setState(() {
-        messageList.value = (message?.first as List<dynamic>);
-      });
-      print(messageList.value);
+    // Bağlantıyı başlat
+    await _hubConnection.start();
+
+    print("SignalR bağlantısı başarılı!");
+
+    // Sunucudan gelen mesajları dinle
+    _hubConnection.on("ReceiveMessagess", (arguments) {
+      if (arguments != null && arguments.length == 3) {
+        final roomId = arguments[0].toString();
+        final roomName = arguments[1].toString();
+        final content = arguments[2].toString();
+
+        setState(() {
+          messages.add({
+            "roomId": roomId,
+            "roomName": roomName,
+            "content": content,
+          });
+        });
+      }
     });
 
-    try {
-      await _hubConnection.start();
-      print("Connected to SignalR Hub");
-      await _hubConnection.invoke("GetUserLastMessages", args: [widget.userId]);
-    } catch (error) {
-      print("Error while connecting: $error");
-    }
-  }
-
-  @override
-  void dispose() {
-    _hubConnection.stop();
-    super.dispose();
+    // Kullanıcının mesajlarını almak için GetLatestMessage çağrısı yap
+    _hubConnection.invoke("GetLatestMessage", args: [userId]).catchError((err) {
+      print("Hata: $err");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Chat Rooms"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ValueListenableBuilder<List<dynamic>>(
-          valueListenable: messageList,
-          builder: (context, messages, child) {
-            return ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                final roomId = message['roomId']; // Odanın ID'sini alın
-
-                return GestureDetector(
-                  onTap: () {
-                    // Odaya geçiş yapabilirsiniz, örneğin:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          roomId: roomId,
-                          userId: widget.userId,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    elevation: 2,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            message['senderUsername'] ?? "Unknown User",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: theme.textTheme.bodyLarge?.color,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            message['content'] ?? "No message",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: theme.textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text("Son Mesajlar")),
+        body: ListView.builder(
+          itemCount: messages.length,
+          itemBuilder: (context, index) {
+            final msg = messages[index];
+            return ListTile(
+              title: Text(msg["roomName"] ?? "Bilinmeyen Oda",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(msg["content"] ?? "Mesaj Yok"),
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class ChatScreen extends StatelessWidget {
-  final String roomId;
-  final String userId;
-
-  const ChatScreen({Key? key, required this.roomId, required this.userId})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Chat Room: $roomId"),
-      ),
-      body: Center(
-        child: Text("Chat with $roomId"),
       ),
     );
   }

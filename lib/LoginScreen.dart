@@ -6,7 +6,7 @@ import 'package:matchapp/main.dart';
 class LoginScreen extends StatefulWidget {
   final Function(int) onLogin;
 
-  LoginScreen({required this.onLogin});
+  const LoginScreen({Key? key, required this.onLogin}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await Dio().post(
-        'http://localhost:5051/api/auth/Login',
+        'http://31.57.156.116:44430/api/auth/Login',
         data: {
           "Username": username,
           "Password": password,
